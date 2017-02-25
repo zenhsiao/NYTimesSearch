@@ -37,6 +37,12 @@ public class SearchActivity extends AppCompatActivity {
     ArrayList<Article> articles;
     ArticleArrayAdapter adapter;
 
+    private final int REQUEST_CODE = 20;
+    RequestParams params = new RequestParams();
+    String date;
+    String order;
+    String category;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -101,10 +107,11 @@ public class SearchActivity extends AppCompatActivity {
         AsyncHttpClient client = new AsyncHttpClient();
         String url = "https://api.nytimes.com/svc/search/v2/articlesearch.json";
 
-        RequestParams params = new RequestParams();
+
         params.put("api-key","29234936851147408e6e5db758bd6d0d");
         params.put("page",0);
         params.put("q",query);
+
 
         client.get(url, params, new JsonHttpResponseHandler(){
             @Override
@@ -114,6 +121,7 @@ public class SearchActivity extends AppCompatActivity {
 
                 try {
                     articleJsonResults = response.getJSONObject("response").getJSONArray("docs");
+                    adapter.clear();
                     adapter.addAll(Article.fromJsonArray(articleJsonResults));
                     adapter.notifyDataSetChanged();
                     Log.d("DEBUG", articles.toString());
@@ -124,4 +132,32 @@ public class SearchActivity extends AppCompatActivity {
             }
         }) ;
     }
+
+    public void onFilterAction(MenuItem mi){
+        //create an intent to display the article
+        Intent i = new Intent(getApplicationContext(),FilterActivity.class);
+        i.putExtra("mode", 2); // pass arbitrary data to launched activity
+        startActivityForResult(i, REQUEST_CODE);//launch the activity
+
+    }
+
+    //filter activity return
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // REQUEST_CODE is defined above
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+            // Extract name value from result extras
+            date = data.getExtras().getString("date");
+            order = data.getExtras().getString("order");
+            category = data.getExtras().getString("category");
+            int code = data.getExtras().getInt("code", 0);
+            // Toast the name to display temporarily on screen
+//            Toast.makeText(this, category, Toast.LENGTH_SHORT).show();
+
+            params.put("begin_date",date);
+            params.put("sort",order);
+            params.put("fq","news_desk:("+category+")");
+        }
+    }
+
 }
