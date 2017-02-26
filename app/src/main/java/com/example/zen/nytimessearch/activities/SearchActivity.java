@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.support.v7.widget.ShareActionProvider;
 
 import com.example.zen.nytimessearch.Article;
 import com.example.zen.nytimessearch.ArticleArrayAdapter;
@@ -41,6 +42,8 @@ public class SearchActivity extends AppCompatActivity {
     String date;
     String order;
     String category;
+
+    private ShareActionProvider miShareAction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
